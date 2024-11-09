@@ -2,6 +2,7 @@
   "name": "digital-app",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://18.138.250.244",
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.1.5",
