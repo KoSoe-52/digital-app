@@ -47,8 +47,7 @@ const Login = () => {
                 setIsLoading(false);
             }
         }
-        setSubmitted(false);
-       
+        setSubmitted(false);   
     }
   return (
         <>
@@ -57,7 +56,7 @@ const Login = () => {
                     <img
                         alt="Your Company"
                         src="https://tailwindui.com/plus/img/logos/mark.svg?color=indigo&shade=600"
-                        className="mx-auto h-10 w-auto"
+                        className="mx-auto h-20 w-auto"
                     />
                     <h2 className="mt-2 text-center text-2xl/9 font-bold tracking-tight text-white">
                         Sign in to your account

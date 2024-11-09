@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import "primereact/resources/themes/lara-light-cyan/theme.css";
 import Home from './pages/Home';
+import Two from './pages/Two';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -12,6 +14,7 @@ root.render(
       <Routes>
         <Route path="/" element={<App />}></Route>
         <Route path="/home" element={<Home />}></Route>
+        <Route path="/setting" element={<Two />}></Route>
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

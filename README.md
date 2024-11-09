@@ -17,3 +17,12 @@ module.exports = {
 
 ## Sweetalert 
 - npm i sweetalert2-react
+## Hero Icon
+- npm i heroicons
+
+https://tailwindui.com/components/marketing/elements/headers
+https://flowbite.com/docs/components/tables/
+## Calendar 
+- npm i primereact (https://primereact.org/calendar/)
+## Skeleton
+- npm install skeleton-effect
