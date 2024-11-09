@@ -17,7 +17,8 @@ const Login = () => {
                 fetch(endpointURL+"/api/v1/loginUser",{
                     method:"POST",
                     headers:{
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin':'*'
                     },
                     body: JSON.stringify({
                         username,password
