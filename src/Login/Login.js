@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'
+import axios from 'axios';
 const Login = () => {
     const [username,setUsername] = useState('');
     const [password,setPassword] = useState('');
@@ -50,6 +51,15 @@ const Login = () => {
         }
         setSubmitted(false);   
     }
+    useEffect(() => {
+        axios.get('https://jsonplaceholder.typicode.com/posts')
+          .then(response => {
+            console.log(response.data); // Axios automatically parses the response as JSON
+            //setLoading(false);
+          })
+          .catch(error => {
+          });
+      }, []);
   return (
         <>
             <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
