@@ -204,11 +204,11 @@ const Home = () => {
       return limitTotal;
     }
     useEffect(() => {
-        if(localStorage.getItem('token') == null || localStorage.getItem('token')=="")
-        {
-            navigate("/");
-        }
-        console.log("afa"+localStorage.getItem('token'));
+        // if(localStorage.getItem('token') == null || localStorage.getItem('token')=="")
+        // {
+        //     navigate("/");
+        // }
+        // console.log("afa"+localStorage.getItem('token'));
         handelFetch();
         window.addEventListener('keydown', handleKeyDown);
         // Cleanup event listener on component unmount
