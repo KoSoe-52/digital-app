@@ -14,7 +14,7 @@ const Login = () => {
         if(!submitted){
             setSubmitted(true);
             try{
-                fetch(endpointURL+"/api/v1/loginUser",{
+                fetch("http://18.138.250.244/api/v1/loginUser",{
                     method:"POST",
                     headers:{
                         'Content-Type': 'application/json',

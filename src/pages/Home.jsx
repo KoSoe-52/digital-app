@@ -95,7 +95,7 @@ const Home = () => {
             if(!submitted){      
                 setSubmitted(true);
                 try{
-                const response = await fetch(endpointURL+"/api/v1/insert",{
+                const response = await fetch("http://18.138.250.244/api/v1/insert",{
                     method:"POST",
                     headers: { 
                         'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ const Home = () => {
     const handelFetch = async (e) => {
         isLoading(true);
         try {
-            const response = await fetch(endpointURL+'/api/v1/three-numbers',{
+            const response = await fetch('http://18.138.250.244/api/v1/three-numbers',{
               headers: { 
                   'Content-Type': 'application/json'
                 }
