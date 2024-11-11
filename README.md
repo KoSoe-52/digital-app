@@ -26,3 +26,12 @@ https://flowbite.com/docs/components/tables/
 - npm i primereact (https://primereact.org/calendar/)
 ## Skeleton
 - npm install skeleton-effect
+## Deployment
+- npm run build
+- build folder ပေါ်လာမယ်..
+- build folder ကို dsimple ရဲ့ public folder ထဲမှာ ထည့်သည်
+- laravel/public folder ထဲကို command နဲ့ဝင် 
+- npm install -g serve
+- serve -s build ကို run 
+- forever run (npm install -g forever)
+- forever start -c serve -s build

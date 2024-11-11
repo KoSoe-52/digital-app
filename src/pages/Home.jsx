@@ -204,10 +204,10 @@ const Home = () => {
       return limitTotal;
     }
     useEffect(() => {
-        // if(localStorage.getItem('token') == null || localStorage.getItem('token')=="")
-        // {
-        //     navigate("/");
-        // }
+        if(localStorage.getItem('token') == null || localStorage.getItem('token')=="")
+        {
+            navigate("/");
+        }
         // console.log("afa"+localStorage.getItem('token'));
         handelFetch();
         window.addEventListener('keydown', handleKeyDown);

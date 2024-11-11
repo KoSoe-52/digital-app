@@ -10,10 +10,10 @@ import Two from './pages/Two';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename={process.env.REACT_APP_PUBLIC_URL}>
+    <BrowserRouter basename={'/build'}>
       <Routes>
         <Route path="/" element={<App />}></Route>
-        <Route path="/home" element={<Home />}></Route>
+        <Route path="/three" element={<Home />}></Route>
         <Route path="/setting" element={<Two />}></Route>
       </Routes>
     </BrowserRouter>
