@@ -33,7 +33,7 @@ const Login = () => {
                         localStorage.setItem('authenticated',true);
                         localStorage.setItem('token', data.token);
                         setIsLoading(false);
-                        navigate("/home");
+                        navigate("/three");
                     }else
                     {
                         Swal.fire({

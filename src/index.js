@@ -13,7 +13,7 @@ root.render(
     <BrowserRouter basename={process.env.REACT_APP_PUBLIC_URL}>
       <Routes>
         <Route path="/" element={<App />}></Route>
-        <Route path="/home" element={<Home />}></Route>
+        <Route path="/three" element={<Home />}></Route>
         <Route path="/setting" element={<Two />}></Route>
       </Routes>
     </BrowserRouter>

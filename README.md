@@ -26,3 +26,6 @@ https://flowbite.com/docs/components/tables/
 - npm i primereact (https://primereact.org/calendar/)
 ## Skeleton
 - npm install skeleton-effect
+
+## git checkout dev
+## npm start
