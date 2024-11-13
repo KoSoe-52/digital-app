@@ -42,7 +42,7 @@ export default function Header() {
           </button>
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
-          <Link to={"/home"} className="text-sm/6 font-semibold ">Home</Link>
+          <Link to={"/three"} className="text-sm/6 font-semibold ">Home</Link>
           <Link to={"/setting"} className="text-sm/6 font-semibold ">Setting</Link>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">

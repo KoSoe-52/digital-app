@@ -20,10 +20,12 @@ const Home = () => {
   const audioRef = useRef(null);
   const saveAudioRef = useRef(null);
   const inputRef = useRef(null);
+  const [date,setDate] = useState([]);
+  const [lastDate,setLastDate] = useState("");
   const [brake,setBrake] = useState(localStorage.getItem("brake") == null? 10000:localStorage.getItem("brake"));
   const endpointURL =process.env.NODE_ENV === 'development' ? process.env.REACT_APP_DEV_MODE : process.env.REACT_APP_PRO_MODE;
   const [values,setValues] = useState({
-        date : "16-11-2024",
+        date : lastDate,
         number:"",
         amount:"",
         numberArray:[]
@@ -34,7 +36,7 @@ const Home = () => {
             inputRef.current.focus();
             setRows(prevItems => [...prevItems, values]); 
             setValues({
-                date : "16-11-2024",
+                date : lastDate,
                 number:"",
                 amount:"",
                 numberArray:[] 
@@ -85,6 +87,17 @@ const Home = () => {
             [key]: value,
         }));
     }
+   
+    function handleChangeDate(e) {
+        const key = e.target.id;
+        const value = e.target.value
+        setLastDate(value);
+        handelFetch(value);
+        setValues(values => ({
+            ...values,
+            [key]: value,
+        }));
+    }
     const  handleSave = async (e) =>{
         isSaveLoading(true);
         const betArray = {
@@ -107,7 +120,7 @@ const Home = () => {
                 if(response.status === 200)
                 {
                     saveAudioRef.current.play();
-                    handelFetch();
+                    handelFetch(lastDate);
                     Swal.fire({
                         text: result.msg,
                         width: 500,
@@ -133,10 +146,10 @@ const Home = () => {
             isSaveLoading(false);
         }
     }
-    const handelFetch = async (e) => {
+    const handelFetch = async (value) => {
         isLoading(true);
         try {
-            const response = await fetch(endpointURL+'/api/v1/three-numbers',{
+            const response = await fetch(endpointURL+'/api/v1/three-numbers?lastDate='+value,{
               headers: { 
                   'Content-Type': 'application/json'
                 }
@@ -144,7 +157,14 @@ const Home = () => {
             const result = await response.json(); 
             if(result.status === true)
             {
-              setData(result.data);                         
+                console.log(result.data);
+               setData(result.data);
+               setDate(result.dates); 
+               setLastDate(result.lastDate);  
+               setValues(values => ({
+                    ...values,
+                    date: result.lastDate,
+                }));  
                const filterSelection = result.data.filter(item => item.number >= start && item.number <= end);
                 setDefaultNumbers(filterSelection);
                 setTotal(result.total);
@@ -168,7 +188,7 @@ const Home = () => {
         console.log("hello" +rows[index].numberArray);
         setUpdateKey(index);
         setValues({
-            date : "16-11-2024",
+            date : lastDate,
             number: rows[index].number,
             amount: rows[index].amount,
             numberArray: rows[index].numberArray
@@ -209,7 +229,8 @@ const Home = () => {
             navigate("/");
         }
         console.log("afa"+localStorage.getItem('token'));
-        handelFetch();
+        let lastDate ="";
+        handelFetch(lastDate);
         window.addEventListener('keydown', handleKeyDown);
         // Cleanup event listener on component unmount
         return () => {
@@ -220,7 +241,7 @@ const Home = () => {
   return (
     <>
        <Header />
-       <div className="grid  gap-2 xl:grid-cols-7 px-3">
+       <div className="grid  gap-2 lg:grid-cols-7 px-3">
         <div className='col-span-2'>
           <div className="grid gap-6 mb-2 md:grid-cols-2">
             <div>
@@ -229,8 +250,13 @@ const Home = () => {
             </div>
             <div>
                 <label for="date" className="block mb-2 text-sm font-medium  dark:text-white">ထီထွက်ရက်စွဲ</label>
-                <select  id="date" onChange={handleChangeText} className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                  <option value="16-11-2024">16-11-2024</option>
+                <select  id="date" onChange={handleChangeDate} className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                   {
+                    date.map((d,ind) =>(
+                        <option  key={ind} value={d.date}>{d.date}</option>
+                        
+                    ))
+                   }
                 </select>
             </div>
           </div>
@@ -332,7 +358,7 @@ const Home = () => {
                     {
                         data.filter((num) => num.amount > brake).map(num => (
                             <tr className="bg-dark  dark:bg-gray-800 dark:border-gray-700">
-                                <td  className="font-medium  whitespace-nowrap">
+                                <td  className="font-bold text-red-600  whitespace-nowrap">
                                     {num.number}
                                 </td>
                                 <td>
@@ -345,10 +371,9 @@ const Home = () => {
               </table>
         </div>
       </div>
-      
       <div>
         <div className="grid grid-cols-12 text-center border-b-2">
-            <div className='col-span-6 grid grid-cols-10'>
+            <div className='col-span-8 grid grid-cols-10'>
                 <div onClick={(e) => filterNumbers(0,99,'element1')} style={{cursor:"pointer",color: getColor('element1')}}>
                     000-099
                 </div>
@@ -380,7 +405,7 @@ const Home = () => {
                     900-999
                 </div>
             </div>
-            <div className='col-span-6'>
+            <div className='col-span-4'>
                 <span className='text-gray-400'>စုစုပေါင်း ကျွံအကွက်</span> 
                 <span className='text-red-600 font-bold'>{data.filter((num) => num.amount > brake).length}</span> 
                 <span className='text-gray-400'>စုစုပေါင်း </span> 
