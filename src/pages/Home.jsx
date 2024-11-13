@@ -20,26 +20,38 @@ const Home = () => {
   const audioRef = useRef(null);
   const saveAudioRef = useRef(null);
   const inputRef = useRef(null);
+  const amountRef = useRef(null);
   const [date,setDate] = useState([]);
   const [lastDate,setLastDate] = useState("");
+  const [isChecked, setIsChecked] = useState(false);
   const [brake,setBrake] = useState(localStorage.getItem("brake") == null? 10000:localStorage.getItem("brake"));
   const endpointURL =process.env.NODE_ENV === 'development' ? process.env.REACT_APP_DEV_MODE : process.env.REACT_APP_PRO_MODE;
   const [values,setValues] = useState({
         date : lastDate,
         number:"",
         amount:"",
-        numberArray:[]
+        numberArray:[],
+        condition: isChecked ?"-":""
     });
-    const handleKeyDown = (event) => {
+    // Handle checkbox change
+    const handleCheckboxChange = (event) => {
+        setIsChecked(event.target.checked);
+        setValues(values => ({
+            ...values,
+            condition: event.target.checked?"-":"",
+        }))
+    };
+    const handleKeyDown = async (event) => {
         //event.preventDefault();
-        if (event.key === 'Enter' && values.number.length >=3 && values.amount >=100) {
+        if (event.key === 'Enter' && values.number.length >=3 && values.amount >=5) {
             inputRef.current.focus();
             setRows(prevItems => [...prevItems, values]); 
             setValues({
                 date : lastDate,
                 number:"",
                 amount:"",
-                numberArray:[] 
+                numberArray:[],
+                condition: isChecked ?"-":""
             });
             audioRef.current.play();
             console.log('Enter key was pressed!');
@@ -53,7 +65,16 @@ const Home = () => {
             handleUpdate();   
         }
     };
-
+    function handleChangeNumber(e) {
+        const key = e.target.id;
+        const value = e.target.value
+        if (/^\d*\/?\d*$/.test(value)) {
+            setValues(values => ({
+                ...values,
+                [key]: value,
+            }))
+        }
+    }
     function handleChange(e) {
         const key = e.target.id;
         const value = e.target.value
@@ -70,7 +91,30 @@ const Home = () => {
     }
     function handleChangeBlur(e) {
         const value = e.target.value
-        if(value.length >= 3)
+        if(value.length == 4)
+        {
+            if(value[3] === "/")
+            {
+                amountRef.current.focus();
+                let digitR = value[0]+""+value[1]+""+value[2];
+                let digitReverseA = digitR[0]+""+digitR[2]+""+digitR[1];
+                let digitReverseB = digitR[1]+""+digitR[0]+""+digitR[2];
+                let digitReverseC = digitR[1]+""+digitR[2]+""+digitR[0];
+                let digitReverseD = digitR[2]+""+digitR[0]+""+digitR[1];
+                let digitReverseE = digitR[2]+""+digitR[1]+""+digitR[0];
+                const arr = new Array(digitR,digitReverseA,digitReverseB,digitReverseC,digitReverseD,digitReverseE);
+                const uniqueArr = [];
+                for (let i = 0; i < arr.length; i++) {
+                    if (!uniqueArr.includes(arr[i])) {
+                        uniqueArr.push(arr[i]);
+                    }
+                }
+                setValues(values => ({
+                    ...values,
+                    numberArray: uniqueArr
+                }));
+            }
+        }else if(value.length >= 3)
         {
             let numArr = value.match(/.{1,3}/g).filter(num => num.length !== 2 && num.length !==1 );
             setValues(values => ({
@@ -79,15 +123,48 @@ const Home = () => {
             }));
         }
     }
-    function handleChangeText(e) {
-        const key = e.target.id;
-        const value = e.target.value
-        setValues(values => ({
-            ...values,
-            [key]: value,
-        }));
+    const handleKeyNumber = (event) => {
+        //event.preventDefault();
+        if(event.key === 'Enter') {
+            const value = event.target.value
+            if(value.length == 4)
+            {
+                if(value[3] === "/")
+                {
+                    amountRef.current.focus();
+                    let digitR = value[0]+""+value[1]+""+value[2];
+                    let digitReverseA = digitR[0]+""+digitR[2]+""+digitR[1];
+                    let digitReverseB = digitR[1]+""+digitR[0]+""+digitR[2];
+                    let digitReverseC = digitR[1]+""+digitR[2]+""+digitR[0];
+                    let digitReverseD = digitR[2]+""+digitR[0]+""+digitR[1];
+                    let digitReverseE = digitR[2]+""+digitR[1]+""+digitR[0];
+                    const arr = new Array(digitR,digitReverseA,digitReverseB,digitReverseC,digitReverseD,digitReverseE);
+                    const uniqueArr = [];
+                    for (let i = 0; i < arr.length; i++) {
+                        if (!uniqueArr.includes(arr[i])) {
+                            uniqueArr.push(arr[i]);
+                        }
+                    }
+                    setValues(values => ({
+                        ...values,
+                        numberArray: uniqueArr
+                    }));
+                }
+            }else if(value.length >= 3)
+            {
+                amountRef.current.focus();
+                let numArr = value.match(/.{1,3}/g).filter(num => num.length !== 2 && num.length !==1 );
+                setValues(values => ({
+                    ...values,
+                    numberArray: numArr,
+                }));
+            }
+        }else if(event.key === 'F4')
+        {
+            handleSave();
+        }
     }
-   
+
     function handleChangeDate(e) {
         const key = e.target.id;
         const value = e.target.value
@@ -185,14 +262,17 @@ const Home = () => {
         return activeElement === element ? 'green' : 'gray';
     };
     const handleTableRow = (index) =>{
-        console.log("hello" +rows[index].numberArray);
+       // console.log("hello" +rows[index].numberArray);
         setUpdateKey(index);
         setValues({
             date : lastDate,
             number: rows[index].number,
             amount: rows[index].amount,
-            numberArray: rows[index].numberArray
+            numberArray: rows[index].numberArray,
+            condition: rows[index].condition 
         });
+        rows[index].condition === "-"?setIsChecked(true):setIsChecked(false)
+        
     }
     const handleUpdate = () => {
         if(updateKey !== null)
@@ -205,19 +285,16 @@ const Home = () => {
             setRows(updatedItems);
             inputRef.current.focus();
             setValues({
-                    date : "16-11-2024",
+                    date : lastDate,
                     number:"",
                     amount:"",
-                    numberArray:[] 
+                    numberArray:[],
+                    condition: isChecked?"-":""
             });
             audioRef.current.play();
             setUpdateLoading(false);
         }   
     }
-    const sumAmounts = () => {
-        const total = rows.reduce((acc, row) => acc +  parseInt(row.amount), 0);
-        return total;
-      };
     const sumAmountsLimit = () => {
       const limits =    data.filter((num) => num.amount > brake);
       const limitTotal = limits.reduce((acc,row) => acc + parseInt(row.amount) - brake,0);
@@ -228,7 +305,6 @@ const Home = () => {
         {
             navigate("/");
         }
-        console.log("afa"+localStorage.getItem('token'));
         let lastDate ="";
         handelFetch(lastDate);
         window.addEventListener('keydown', handleKeyDown);
@@ -242,106 +318,104 @@ const Home = () => {
     <>
        <Header />
        <div className="grid  gap-2 lg:grid-cols-7 px-3">
-        <div className='col-span-2'>
-          <div className="grid gap-6 mb-2 md:grid-cols-2">
-            <div>
-                <label for="brake" className="block mb-2 text-sm font-medium  dark:text-white">ဘရိတ်</label>
-                <input type="text" id="brake" value={brake} onChange={handleBrake} onKeyDown={handleKeyDown}  className="bg-black border  border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-dark"  required />
-            </div>
-            <div>
-                <label for="date" className="block mb-2 text-sm font-medium  dark:text-white">ထီထွက်ရက်စွဲ</label>
-                <select  id="date" onChange={handleChangeDate} className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                   {
-                    date.map((d,ind) =>(
-                        <option  key={ind} value={d.date}>{d.date}</option>
-                        
-                    ))
-                   }
-                </select>
-            </div>
-          </div>
-          <div className="grid gap-6 mb-2 md:grid-cols-2">
-            <div>
-                <label for="number" className="block mb-2 text-sm font-medium  dark:text-white">ဂဏန်း</label>
-                <input type="text" ref={inputRef} onKeyDown={handleKeyDown}   id="number" onBlur={handleChangeBlur} autoComplete='off' value={values.number} onChange={handleChange} className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-dark"  required />
-            </div>
-            <div>
-                <label for="amount" className="block mb-2  text-sm font-medium  dark:text-white">ထိုးကြေး</label>
-                <input type="text" id="amount" onKeyDown={handleKeyDown}  onChange={handleChange}   value={values.amount} autoComplete='off'  className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
-            </div>
-          </div>
-          <div className="grid gap-2 mb-2 md:grid-cols-3">
+            <div className='col-span-2'>
+            <div className="grid gap-2 mb-2 md:grid-cols-2">
                 <div>
-                    <label for="update" className="block  text-sm font-medium  dark:text-white">&nbsp;</label>
-                    <button  id="update" onClick={ handleUpdate} className="flex w-full justify-center rounded-md bg-green-500 px-3 py-3 text-sm/6 font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                       {updateLoading? "Updating...":"Update (F6)"}
-                    </button>
+                    <label for="brake" className="block mb-1 text-sm font-small  dark:text-white">ဘရိတ်</label>
+                    <input type="text" id="brake" value={brake} onChange={handleBrake} onKeyDown={handleKeyDown}  className="bg-black border  border-gray-300  text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-dark"  required />
                 </div>
                 <div>
-                    <label for="save" className="block  text-sm font-medium  dark:text-white">&nbsp;</label>
-                    <button id="save" onClick={handleSave} className="flex w-full justify-center rounded-md bg-indigo-400 px-3 py-3 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                      {saveLoading?"Saving...":"Save (F4)"}
-                    </button>
+                    <label for="date" className="block mb-1 text-sm font-small  dark:text-white">ထီထွက်ရက်စွဲ</label>
+                    <select  id="date" onChange={handleChangeDate} className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                    {
+                        date.map((d,ind) =>(
+                            <option  key={ind} value={d.date}>{d.date}</option>
+                            
+                        ))
+                    }
+                    </select>
+                </div>
+            </div>
+            <div className="grid gap-2 mb-2 md:grid-cols-2">
+                <div>
+                    <label for="number" className="block mb-1 text-sm font-small  dark:text-white">ဂဏန်း
+                       ( <input id="buy" checked={isChecked} onChange={handleCheckboxChange}  type="checkbox" className="ml-2  nw aet ahg bal bqa" /> <label for="buy" className='cursor-pointer'>Buy</label> )
+                    </label>
+                    <input type="text" ref={inputRef} 
+                    id="number" onBlur={handleChangeBlur} onKeyDown={handleKeyNumber} autoComplete='off'
+                    value={values.number} onChange={handleChangeNumber} 
+                    className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-dark"  required />
                 </div>
                 <div>
-                    <label className="block  text-sm font-medium  dark:text-white">&nbsp;</label>
-                    <button  className="flex w-full justify-center rounded-md bg-purple-500 px-3 py-3 text-sm/6 font-semibold text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                       {total}
-                    </button>
+                    <label for="amount" className="block mb-1  text-sm font-small  dark:text-white">ထိုးကြေး</label>
+                    <input type="text" ref={amountRef}  id="amount" onKeyDown={handleKeyDown}  onChange={handleChange}   value={values.amount} autoComplete='off'  className="bg-black border text-white border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required />
                 </div>
-          </div>
-        
-        </div>
-        <div className='col-span-4'>
-          <div className="relative overflow-y-auto max-h-64 shadow-md sm:rounded-lg">
-              <table className="w-full text-sm table-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                  <thead className="text-xs text-gray-700 uppercase  dark:bg-gray-700 dark:text-gray-400">
-                      <tr>
-                          <th scope="col" className="px-2 py-2">
-                              Date
-                          </th>
-                          <th scope="col" className="px-2 py-2">
-                              Time
-                          </th>
-                          <th scope="col" className="px-2 py-2">
-                              Number
-                          </th>
-                          <th scope="col" className="px-2 py-2">
-                              Amount
-                          </th>
-                          <th scope="col" className="px-2 py-2">
-                              Total
-                          </th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                   {rows.map((row, index) => (
-                    <tr key={index} onClick={(e)=>handleTableRow(index)} className="bg-dark border-b dark:bg-gray-800 dark:border-gray-700">
-                        <td className="px-2 py-2">
-                            {row.date}
-                        </td>  
-                        <td className="px-2 py-2">
-                            3:30
-                        </td>  
-                        <td className="px-2 py-2">
-                            {row.number}
-                        </td> 
-                        <td className="px-2 py-2">
-                            {row.amount}
-                        </td> 
-                        <td className="px-2 py-2" style={{textAlign:"right",paddingRight:"30px"}}>
-                            {row.number.match(/.{1,3}/g).filter(num => num.length !== 2 && num.length !==1 ).length * row.amount }
-                        </td>       
-                    </tr>
-                  ))} 
-                  <tr>
-                    <td colSpan={4}></td>
-                    <td colSpan={1} className='text-green-600' style={{textAlign:"right",paddingRight:"30px"}}>{sumAmounts()}</td>
-                  </tr>
-                  </tbody>
-              </table>
-          </div>
-        </div>
+            </div>
+                <div className="grid gap-2 mb-1 md:grid-cols-3">
+                    <div>
+                        <button  id="update" onClick={ handleUpdate} className="flex w-full justify-center rounded-md bg-green-500 px-2 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        {updateLoading? "Updating...":"Update (F6)"}
+                        </button>
+                    </div>
+                    <div>
+                        <button id="save" onClick={handleSave} className="flex w-full justify-center rounded-md bg-indigo-400 px-2 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        {saveLoading?"Saving...":"Save (F4)"}
+                        </button>
+                    </div>
+                    <div>
+                        <button  className="flex w-full justify-center rounded-md bg-purple-500 px-2 py-2 text-sm/6 font-semibold text-white shadow-sm hover:bg-purple-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        {total}
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div className='col-span-4'>
+            <div className="relative overflow-y-auto max-h-64 shadow-md sm:rounded-lg">
+                <table className="w-full text-sm table-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+                    <thead className="text-xs text-gray-700 uppercase  dark:bg-gray-700 dark:text-gray-400">
+                        <tr>
+                            <th scope="col" className="px-2 py-2">
+                                Date
+                            </th>
+                            <th scope="col" className="px-2 py-2">
+                                Time
+                            </th>
+                            <th scope="col" className="px-2 py-2">
+                                Number
+                            </th>
+                            <th scope="col" className="px-2 py-2">
+                                Amount
+                            </th>
+                            <th scope="col" className="px-2 py-2">
+                                Total
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {rows.map((row, index) => (
+                        <tr key={index} onClick={(e)=>handleTableRow(index)}   className="hover:bg-gray-700 bg-dark border-b dark:bg-gray-800 dark:border-gray-700">
+                            <td className="px-2 py-2">
+                                {row.date}
+                            </td>  
+                            <td className="px-2 py-2">
+                                3:30
+                            </td>  
+                            <td className="px-2 py-2">
+                                {row.number}
+                            </td> 
+                            <td className="px-2 py-2">
+                                {row.condition}{row.amount}
+                            </td> 
+                            <td className="px-2 py-2" style={{textAlign:"right",paddingRight:"30px"}}>
+                                {/* {row.number.match(/.{1,3}/g).filter(num => num.length !== 2 && num.length !==1 ).length * row.amount } */}
+                                {row.condition}{row.numberArray.length * row.amount}
+                            </td>       
+                        </tr>
+                    ))} 
+                    </tbody>
+                </table>
+            </div>
+            </div>
         <div className='col-span-1 overflow-y-auto max-h-64'>
             <table className="w-full text-sm table-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                   <thead className="text-xs text-gray-700 uppercase  dark:bg-gray-700 dark:text-gray-400">

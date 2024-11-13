@@ -43,6 +43,7 @@ export default function Header() {
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
           <Link to={"/three"} className="text-sm/6 font-semibold ">Home</Link>
+          <Link to={"/detail"} className="text-sm/6 font-semibold ">Detail</Link>
           <Link to={"/setting"} className="text-sm/6 font-semibold ">Setting</Link>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
@@ -80,6 +81,12 @@ export default function Header() {
                   className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
                 >
                   Home
+                </Link>
+                <Link
+                  to={"/detail"}
+                  className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-gray-900 hover:bg-gray-50"
+                >
+                  Detail
                 </Link>
                 <Link
                   to={"/setting"}
